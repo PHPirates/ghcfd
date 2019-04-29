@@ -5,11 +5,13 @@ import numpy
 import datetime
 import pickle
 
-
 USERNAME = ''
 PASSWORD = ''
 GITHUB_REPO = ''
 PLOT_TITLE = ''
+
+# Issues per time span
+time_span = 7
 
 g = Github(USERNAME, PASSWORD)
 repo = g.get_repo(GITHUB_REPO)
@@ -20,7 +22,7 @@ try:
     issues_dump = pickle.load(open("issues_dump", "rb"))
 except Exception:
     issues_dump = None
-if issues_dump == None:
+if issues_dump is None:
     issues_arr_dump = []
     issues = repo.get_issues("*", "closed")
     for issue in issues:
@@ -54,40 +56,44 @@ proj_end_date = max_issue.created_at
 proj_start_week_date = proj_start_date
 if proj_start_date.weekday() != 0:
     proj_start_week_date -= \
-            datetime.timedelta(days=proj_start_date.weekday())
+        datetime.timedelta(days=proj_start_date.weekday())
 
 current_date = datetime.datetime.now()
 proj_end_week_date = current_date
 if proj_end_date.weekday() != 4:
     proj_end_week_date += \
-            datetime.timedelta(days=4-proj_end_date.weekday())
+        datetime.timedelta(days=4 - proj_end_date.weekday())
 
 last_week_start_date = proj_end_week_date - datetime.timedelta(days=4)
 
 date_inc = proj_start_week_date
-week_open_accum = 0
-week_closed_accum = 0
 current_week_start_date = None
+
 while date_inc <= last_week_start_date:
     if date_inc.weekday() == 0:
         current_week_start_date = date_inc
+
+    current_week_end_date = current_week_start_date + datetime.timedelta(days=time_span)
+
+    # Number of open issues in a certain week
+    nr_open_issues = 0
+    nr_closed_issues = 0
+
     counter = 0
+
     while counter < len(issues_dump):
-        current_week_end_date = current_week_start_date + \
-                datetime.timedelta(days=7)
-        if (issues_dump[counter].created_at >= current_week_start_date) and \
-           (issues_dump[counter].created_at <= current_week_end_date):
-            if (issues_dump[counter].state != 'closed'):
-                week_open_accum += 1
-        if issues_dump[counter].state == 'closed':
-            if (issues_dump[counter].closed_at >= current_week_start_date) and \
-                (issues_dump[counter].closed_at <= current_week_end_date):
-                week_closed_accum += 1
+
+        issue = issues_dump[counter]
+        if (issue.created_at <= current_week_start_date) and \
+                (issue.state != 'closed' or issue.closed_at >= current_week_start_date):
+            nr_open_issues += 1
+
         counter += 1
+
     weeks_arr.append([current_week_start_date.strftime('%Y-%m-%d'),
-                               current_week_end_date.strftime('%Y-%m-%d'),
-                               week_open_accum, week_closed_accum])
-    date_inc += datetime.timedelta(days=7)
+                      current_week_end_date.strftime('%Y-%m-%d'),
+                      nr_open_issues, nr_closed_issues])
+    date_inc += datetime.timedelta(days=time_span)
 
 arr_opened = [item[2] for item in weeks_arr]
 arr_closed = [item[3] for item in weeks_arr]
@@ -103,7 +109,7 @@ ax.set_ylabel('Issues')
 ax.set_xlabel('Weeks')
 ax.set_xlim(0, len(weeks_arr) - 1)
 ax.set_ylim(0, plot_vert_height + plot_vert_height * 0.1)
-ax.legend(['Closed', 'Opened'])
+# ax.legend(['Closed', 'Opened'])
 plot_file_name = 'gh_issues_plot_' + str(current_date.strftime('%Y-%m-%d')) + '.png'
 plot_file = pyplot.savefig(plot_file_name)
 pyplot.show()
