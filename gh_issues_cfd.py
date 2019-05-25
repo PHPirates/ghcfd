@@ -14,8 +14,9 @@ if __name__ == '__main__':
 
     USERNAME = sys.argv[1]
     PASSWORD = sys.argv[2]
-    GITHUB_REPO = 'Ruben-Sten/TeXiFy-IDEA'
-    PLOT_TITLE = 'Number of open TeXiFy-IDEA issues per day'
+    # GITHUB_REPO = 'Ruben-Sten/TeXiFy-IDEA'
+    GITHUB_REPO = 'gradle/gradle'
+    PLOT_TITLE = f'Number of open {GITHUB_REPO} issues and pull requests'
 
     # Issues per this time span, in days
     time_span = 1
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             min_issue = issue
 
     proj_start_date = min_issue.created_at
-    proj_end_date = max_issue.created_at
+    proj_end_date = datetime.datetime.now()
 
     # Find the week of the first and last issue
     proj_start_week_date = proj_start_date
@@ -119,6 +120,10 @@ if __name__ == '__main__':
     # weeks = numpy.arange(0, len(arr_opened), 1)
     x_values = [item[0] for item in weeks_arr]
     y_values = arr_opened
+
+    print("Last data:")
+    print(x_values[-1:])
+    print(y_values[-1:])
 
     fig, ax = pyplot.subplots()
     pyplot.xticks(rotation=70)
