@@ -14,8 +14,7 @@ if __name__ == '__main__':
 
     USERNAME = sys.argv[1]
     PASSWORD = sys.argv[2]
-    # GITHUB_REPO = 'Ruben-Sten/TeXiFy-IDEA'
-    GITHUB_REPO = 'gradle/gradle'
+    GITHUB_REPO = 'Ruben-Sten/TeXiFy-IDEA'
     PLOT_TITLE = f'Number of open {GITHUB_REPO} issues and pull requests'
 
     # Issues per this time span, in days

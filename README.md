@@ -6,4 +6,5 @@ The issues CFD will generate a local dump the first time as 'issues_dump'. This 
 Example:
 
 ![example](gradle_plot_2019-05-25.png)
+![example](tensorflow_plot_2019-05-25.png)
 
